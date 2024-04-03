@@ -1,4 +1,6 @@
 use std::{collections::hash_map::DefaultHasher, hash::{Hash, Hasher}, ops::Index};
+use std::iter::Filter;
+use std::slice::Iter;
 
 use getset::*;
 use image::DynamicImage;
@@ -11,7 +13,7 @@ pub struct BitMap<'a> {
     #[getset(get_copy = "pub", set = "pub")]
     height: usize,
     hash: u64,
-    pub body: &'a [u8],
+    body: &'a [u8],
 }
 
 impl<'a> BitMap<'a> {
@@ -62,6 +64,18 @@ impl<'a> BitMap<'a> {
                 buffer[offset + 2] = self[i + 2];
             }
         }
+    }
+    
+    pub fn iter(&self) -> Iter<'a, u8> {
+        self.body.iter()
+    }
+}
+
+impl<'a> Iterator for BitMap<'a> {
+    type Item = u8;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.body.iter().cloned().next()
     }
 }
 
