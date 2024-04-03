@@ -1,15 +1,7 @@
-use std::slice::Iter;
-use std::{
-    collections::hash_map::DefaultHasher,
-    hash::{Hash, Hasher},
-    ops::Index,
-};
-
 use crate::io::Write;
 use getset::*;
-use image::DynamicImage;
 
-#[derive(Debug, Default, Clone, Copy, Hash, Setters, CopyGetters)]
+#[derive(Debug, Default, Clone, Copy, Hash, Eq, Setters, CopyGetters)]
 pub struct BitMap<'a> {
     #[getset(get_copy = "pub", set = "pub")]
     width: usize,
@@ -21,6 +13,9 @@ pub struct BitMap<'a> {
 
 impl<'a> BitMap<'a> {
     pub fn new(width: usize, height: usize) -> Self {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        
         let size_body = width * height;
 
         unsafe {
@@ -40,13 +35,29 @@ impl<'a> BitMap<'a> {
         }
     }
 
+    /// Creating a hash of the container for faster comparison of BitMaps, 
+    /// without their full content comparison.
+    /// 
+    /// # Examples
+    /// ``` rust
+    /// use bitmap_copy::BitMap;
+    ///
+    /// let bit_map1 = BitMap::new(32, 32);
+    /// let bit_map2 = BitMap::new(16, 16);
+    ///
+    /// assert_ne!(bit_map1, bit_map2);
+    /// ```
     pub fn hash_update(&mut self) {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        
         let mut default_hash = DefaultHasher::new();
         self.body.hash(&mut default_hash);
         self.hash = default_hash.finish();
     }
 
-    pub fn from_img(img: &'a DynamicImage) -> std::io::Result<Self> {
+    /// Uploading an image to a container using crate Image.
+    pub fn from_img(img: &'a image::DynamicImage) -> std::io::Result<Self> {
         let body = img.as_bytes();
         let (width, height) = (img.width() as usize, img.height() as usize);
 
@@ -69,7 +80,7 @@ impl<'a> BitMap<'a> {
         }
     }
 
-    pub fn iter(&self) -> Iter<'a, u8> {
+    pub fn iter(&self) -> std::slice::Iter<'a, u8> {
         self.body.iter()
     }
 }
@@ -79,6 +90,12 @@ impl<'a> Iterator for BitMap<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.body.iter().cloned().next()
+    }
+}
+
+impl<'a> std::io::Read for BitMap<'a> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        self.body.read(buf)
     }
 }
 
@@ -92,7 +109,7 @@ impl<'a> Write<'a> for BitMap<'a> {
     }
 }
 
-impl<'a> Index<usize> for BitMap<'a> {
+impl<'a> std::ops::Index<usize> for BitMap<'a> {
     type Output = u8;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -109,5 +126,3 @@ impl<'a> PartialEq for BitMap<'a> {
         self.hash != other.hash
     }
 }
-
-impl<'a> Eq for BitMap<'a> {}
