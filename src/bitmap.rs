@@ -15,7 +15,7 @@ impl<'a> BitMap<'a> {
     pub fn new(width: usize, height: usize) -> Self {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        
+
         let size_body = width * height;
 
         unsafe {
@@ -35,9 +35,9 @@ impl<'a> BitMap<'a> {
         }
     }
 
-    /// Creating a hash of the container for faster comparison of BitMaps, 
+    /// Creating a hash of the container for faster comparison of BitMaps,
     /// without their full content comparison.
-    /// 
+    ///
     /// # Examples
     /// ``` rust
     /// use bitmap_copy::BitMap;
@@ -50,7 +50,7 @@ impl<'a> BitMap<'a> {
     pub fn hash_update(&mut self) {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        
+
         let mut default_hash = DefaultHasher::new();
         self.body.hash(&mut default_hash);
         self.hash = default_hash.finish();
