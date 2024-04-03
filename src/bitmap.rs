@@ -1,10 +1,13 @@
-use std::{collections::hash_map::DefaultHasher, hash::{Hash, Hasher}, ops::Index};
-use std::iter::Filter;
 use std::slice::Iter;
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+    ops::Index,
+};
 
+use crate::io::Write;
 use getset::*;
 use image::DynamicImage;
-use crate::io::Write;
 
 #[derive(Debug, Default, Clone, Copy, Hash, Setters, CopyGetters)]
 pub struct BitMap<'a> {
@@ -32,7 +35,7 @@ impl<'a> BitMap<'a> {
                 width,
                 height,
                 hash: default_hash.finish(),
-                body: slice
+                body: slice,
             }
         }
     }
@@ -58,14 +61,14 @@ impl<'a> BitMap<'a> {
         for y in 0..self.height() {
             for x in 0..self.width() {
                 let offset = y * pitch + x * 3;
-                let i = (y * self.width() + x)*4;
+                let i = (y * self.width() + x) * 4;
                 buffer[offset] = self[i];
                 buffer[offset + 1] = self[i + 1];
                 buffer[offset + 2] = self[i + 2];
             }
         }
     }
-    
+
     pub fn iter(&self) -> Iter<'a, u8> {
         self.body.iter()
     }
@@ -85,7 +88,7 @@ impl<'a> Write<'a> for BitMap<'a> {
 
         self.hash_update();
 
-        Ok(buf.len()) 
+        Ok(buf.len())
     }
 }
 

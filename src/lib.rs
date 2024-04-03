@@ -1,4 +1,4 @@
-pub mod io;
 pub mod bitmap;
+pub mod io;
 
 pub use bitmap::*;
