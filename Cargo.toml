@@ -8,8 +8,9 @@ edition = "2021"
 keywords = ["bitmap", "image"]
 categories = ["data-structures", "multimedia::images"]
 readme = "README.md"
-homepage = ""
-repository = ""
+homepage = "https://github.com/MayorDi/bitmap_copy"
+repository = "https://github.com/MayorDi/bitmap_copy"
+publish = true
 
 [dependencies]
 getset = "*"
