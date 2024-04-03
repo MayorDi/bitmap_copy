@@ -1,0 +1,17 @@
+[package]
+name = "bitmap_copy"
+description = "BitMap is an image container"
+license = "Apache-2.0"
+authors = ["Dmitriy Mayorov <MayorDi@yandex.ru>"]
+version = "0.1.0"
+edition = "2021"
+keywords = ["bitmap", "image"]
+categories = ["data-structures", "multimedia::images"]
+readme = "README.md"
+homepage = ""
+repository = ""
+
+[dependencies]
+getset = "*"
+image = "*"
+libc = "*"
