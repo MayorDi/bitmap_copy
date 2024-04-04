@@ -1,3 +1,5 @@
+use std::io::Read;
+use std::path::Path;
 use crate::io::Write;
 use getset::*;
 
@@ -17,21 +19,19 @@ impl<'a> BitMap<'a> {
         use std::hash::{Hash, Hasher};
 
         let size_body = width * height;
+        
+        let slice = unsafe {
+            crate::mem::malloc_array::<'a, u8>(size_body)
+        };
 
-        unsafe {
-            let ptr_body = libc::malloc(size_body);
-            let ptr_body = libc::memset(ptr_body, 0, size_body) as *const u8;
-            let slice = std::slice::from_raw_parts::<'a, u8>(ptr_body, size_body);
+        let mut default_hash = DefaultHasher::new();
+        slice.hash(&mut default_hash);
 
-            let mut default_hash = DefaultHasher::new();
-            slice.hash(&mut default_hash);
-
-            Self {
-                width,
-                height,
-                hash: default_hash.finish(),
-                body: slice,
-            }
+        Self {
+            width,
+            height,
+            hash: default_hash.finish(),
+            body: slice,
         }
     }
 
